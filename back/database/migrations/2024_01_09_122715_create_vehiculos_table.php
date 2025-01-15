@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('vehiculos', function (Blueprint $table) {
             $table->id();
             $table->string('placa')->unique();
-            $table->string('tipo');
-            $table->string('linea');
+            $table->string('tipo')->nullable();
+            $table->string('linea')->nullable();
             $table->string('numero')->nullable();
-            $table->string('cedula');
-            $table->string('chofer');
+            $table->string('carnet')->nullable();
+            $table->string('chofer')->nullable();
             $table->timestamps();
         });
     }

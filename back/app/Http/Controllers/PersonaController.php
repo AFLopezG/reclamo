@@ -18,12 +18,12 @@ class PersonaController extends Controller
     }
 
     public function searchpersona(Request $request){
-        if($request->comp=='' || $request->comp==null)
+        //if($request->comp=='' || $request->comp==null)
             $persona = Persona::where('cedula', $request->cedula)->first();
-        else{
-            $persona = Persona::where('cedula', $request->cedula)->where('comp',strtoupper($request->comp))->first();
+        //else{
+         //   $persona = Persona::where('cedula', $request->cedula)->where('comp',strtoupper($request->comp))->first();
 
-            }
+          //  }
 
         if ($persona) {
             return response()->json(['success' => true, 'persona' => $persona]);

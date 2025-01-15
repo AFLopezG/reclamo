@@ -19,11 +19,14 @@ return new class extends Migration
             $table->text('descripcion');
             $table->string('imagen')->nullable();
             $table->string('cedula');
-            $table->string('comp')->nullable();
+           // $table->string('comp')->nullable();
             $table->string('nombre');
             $table->string('telefono');
+            $table->string('placa');
             $table->unsignedBigInteger('persona_id')->nullable();
             $table->foreign('persona_id')->references('id')->on('personas');      
+            $table->unsignedBigInteger('vehiculo_id')->nullable();
+            $table->foreign('vehiculo_id')->references('id')->on('vehiculos');      
             $table->timestamps();
         });
     }

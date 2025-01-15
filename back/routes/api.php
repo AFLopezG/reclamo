@@ -18,6 +18,7 @@ Route::post('login', [App\Http\Controllers\UserController::class, 'login']);
 Route::post('formulario',[\App\Http\Controllers\FormularioController::class,'store']); 
 Route::post('searchpersona/',[\App\Http\Controllers\PersonaController::class,'searchpersona']); 
 Route::get('generatePdf/{id}',[\App\Http\Controllers\FormularioController::class,'generatePdf']); 
+Route::get('delito', [App\Http\Controllers\DelitoController::class,'index']);
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {

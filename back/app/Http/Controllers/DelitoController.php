@@ -14,6 +14,7 @@ class DelitoController extends Controller
     public function index()
     {
         //
+        return Delito::all();
     }
 
     /**

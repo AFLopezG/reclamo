@@ -47,14 +47,13 @@
             <td class='image'><b style='font-size:10px'>No: {{$reclamo->id}}</b></b><br><img src="data:image/png;base64, {!! $qrcode !!}" style="height: 50px;width: 50px;"></td>
         </tr>
     </table>
-    
-    
+       
     
     <div class="info">
         <table class='tab1'><tr><th>Fecha:</th><td>{{ $reclamo->fecha }}</td><th>Hora:</th><td>{{ $reclamo->hora }}</td></tr></table>
         <div class='context-title'>
             <div class="context-title-text">Datos Demandate</div>
-            <table class="tab1"><tr><th>Cedula:</th><td>{{ $reclamo->persona->cedula  }} {{$reclamo->persona->comp}}</td><th>Nombre:</th><td>{{ $reclamo->persona->nombre }}</td><th>Teléfono:</th><td>{{ $reclamo->persona->telefono }}</td></tr>
+            <table class="tab1"><tr><th>Cedula:</th><td>{{ $reclamo->cedula }}</td><th>Nombre:</th><td>{{ $reclamo->nombre }}</td><th>Teléfono:</th><td>{{ $reclamo->telefono }}</td></tr>
             <tr><th>Direccion: </th><td colspan="5">{{ $reclamo->direccion }}</td></tr>
             </table>
         </div>
@@ -65,17 +64,23 @@
         </div>
         </div>
         <div class='context-title'>
+            <div class="context-title-text">VEHICULO</div>
+            <div style="padding: 5px">{{ $reclamo->placa }}</div>
+        </div>
+        </div>
+        <br>
+        <div class='context-title'>
             <div class="context-title-text">Foto Adjunta</div>
             <div style="padding: 5px">
                 @if($reclamo->imagen)
                 <div class="image">
-                    <img src="{{ public_path('imagenes/' . $reclamo->imagen) }}" alt="Imagen de Reclamo" style="max-width: 500px; height: 600px;">
+                    <img src="{{ public_path('imagenes/' . $reclamo->imagen) }}" alt="Imagen de Reclamo" style="max-width: 500px; height: 500px;">
                 </div>
             @endif
             </div>
         </div>
         </div><br><br><br><br>
-        <div class="firma">{{ $reclamo->persona->nombre }} <br>{{ $reclamo->persona->cedula }}</div>
+        <div class="firma">{{ $reclamo->nombre }} <br>{{ $reclamo->cedula }}</div>
     </div>
 
 

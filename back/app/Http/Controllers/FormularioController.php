@@ -6,6 +6,7 @@ use App\Models\Formulario;
 use App\Models\Persona;
 use App\Http\Requests\StoreFormularioRequest;
 use App\Http\Requests\UpdateFormularioRequest;
+use App\Models\Vehiculo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
@@ -56,20 +57,26 @@ class FormularioController extends Controller
         //
         $request->validate([
             'cedula' => 'required',
-            'comp' => '',
+            //'comp' => '',
             'nombre' => 'required',
             'telefono' => 'required',
             'direccion' => 'required',
             'descripcion' => 'required',
+            'placa'=> 'required',
+            'tipo'=> '',
+            'linea'=> '',
+            'numero'=> '',
+            'carnet'=> '',
+            'chofer'=> '',
+            'delito_id'=>'required',
             'imagen' => 'nullable|image|max:2048',
         ]);
 
-        if($request->comp=='' || $request->comp==null)
+        //if($request->comp=='' || $request->comp==null)
             $persona = Persona::where('cedula', $request->cedula)->first();
-        else{
-            $persona = Persona::where('cedula', $request->cedula)->where('comp',$request->comp)->first();
-
-            }
+        //else{
+         //   $persona = Persona::where('cedula', $request->cedula)->where('comp',$request->comp)->first();
+          //  }
 
         if ($persona) {
             // Actualizar datos de la persona si ya existe
@@ -81,9 +88,30 @@ class FormularioController extends Controller
             // Crear nueva persona si no existe
             $persona = Persona::create([
                 'cedula' => $request->cedula,
-                'comp' => strtoupper($request->comp),
+                //'comp' => strtoupper($request->comp),
                 'nombre' => strtoupper($request->nombre),
                 'telefono' => $request->telefono,
+            ]);
+        }
+
+        $vehiculo=Vehiculo::where('placa',$request->placa)->first();
+        if($vehiculo){
+            $vehiculo->update([
+                'tipo' => strtoupper($request->tipo) ,
+                'linea' => strtoupper($request->nombre),
+                'numero' => strtoupper($request->numero),
+                'carnet'=> strtoupper($request->carnet),
+                'chofer'=> strtoupper($request->chofer)
+            ]);
+        }
+        else{
+            $vehiculo = Vehiculo::create([
+                'placa' => strtoupper($request->placa),
+                'tipo' => strtoupper($request->tipo),
+                'linea' => strtoupper($request->nombre),
+                'numero' => strtoupper($request->numero),
+                'carnet'=> strtoupper($request->carnet),
+                'chofer'=> strtoupper($request->chofer)
             ]);
         }
 
@@ -93,9 +121,11 @@ class FormularioController extends Controller
             'direccion' => $request->direccion,
             'descripcion' => $request->descripcion,
             'cedula' => $persona->cedula,
-            'comp' => $persona->comp,
+            //'comp' => $persona->comp,
             'nombre' => $persona->nombre,
             'telefono' => $persona->telefono,
+            'placa' => $vehiculo->placa,
+            'vehiculo_id' => $vehiculo->id, 
         ]);
 
         if ($request->hasFile('imagen')) {
@@ -118,6 +148,7 @@ class FormularioController extends Controller
             'message' => 'Formulario registrado con éxito',
             'data' => [
                 'persona' => $persona,
+                'vehiculo' => $vehiculo,
                 'formulario' => $formulario,
             ]
         ]);

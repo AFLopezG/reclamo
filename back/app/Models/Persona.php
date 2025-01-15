@@ -10,7 +10,7 @@ class Persona extends Model
     use HasFactory;
     protected $fillable = [
         'cedula',
-        'comp',
+        //'comp',
         'nombre',
         'telefono',
      ];

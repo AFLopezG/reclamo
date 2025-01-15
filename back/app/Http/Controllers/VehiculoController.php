@@ -19,6 +19,16 @@ class VehiculoController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
+    public function searchVehiculo($placa){
+        $vehiculo = Vehiculo::where('placa',$placa)->first();
+        if ($vehiculo) {
+            return response()->json(['success' => true, 'vehiculo' => $vehiculo]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+     }
+
     public function create()
     {
         //

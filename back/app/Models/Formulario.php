@@ -15,14 +15,20 @@ class Formulario extends Model
         'descripcion',
         'imagen',
         'cedula',
-        'comp',
+        //'comp',
         'nombre',
         'telefono',
+        'placa',
         'persona_id',
+        'vehiculo_id',
     ];
 
     public function persona()
     {
         return $this->belongsTo(Persona::class);
+    }
+    public function vehiculo()
+    {
+        return $this->belongsTo(Vehiculo::class);
     }
 }

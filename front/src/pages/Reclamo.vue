@@ -4,7 +4,7 @@
         <q-page>
           <div class="row">
             <div class="col-12 q-pa-lg">
-              <div class="text-h4 text-center q-pa-xs text-black text-bold">RECLAMO ATM   </div>
+              <div class="text-h4 text-center q-pa-xs text-black text-bold">RECLAMO <br><span style="font-size: 12px;">AUTORIDAD DE TRANSPORTE MUNICIPAL</span>   </div>
             <q-card class="my-card">
       <q-card-section class="bg-primary text-white">
         <div class="text-h6">FORMULARIO</div>
@@ -14,13 +14,17 @@
         <q-form @submit="onSubmit" class="q-gutter-md">
       <!-- Datos de Persona -->
        <div class="row">
-        <div class="col-8 q-pa-xs"><q-input outlined v-model="persona.cedula" label="Cédula" @update:model-value="getPersona()" type="number" required/></div>
-        <div class="col-4 q-pa-xs"><q-input outlined v-model="persona.comp" label="Comp" @update:model-value="getPersona()" /></div>
+        <div class="col-12 q-pa-xs"><q-input outlined v-model="persona.cedula" label="Cédula" @update:model-value="getPersona()" type="number" required/></div>
+        <!--<div class="col-4 q-pa-xs"><q-input outlined v-model="persona.comp" label="Comp" @update:model-value="getPersona()" /></div>-->
         <div class="col-12 q-pa-xs"><q-input outlined v-model="persona.nombre" label="Nombre" required/></div>
         <div class="col-12 q-pa-xs"><q-input outlined v-model="persona.telefono" label="Teléfono" type="number" required/></div>
        </div>
 
-
+      <div class="row">
+        <div class="col-12 q-pa-xs"><q-input outlined v-model="vehiculo.placa" type="text" label="PLACA" required/></div>
+        <div class="col-12 q-pa-xs"><q-select outlined v-model="delito" :options="delitos" label="Infraccion"  option-label="detalle"/></div>
+        <!--<div class="col-6"><q-select v-model="vehiculo.tipo" :options="['Taxi','Mini/Trufi','Microbus']" label="Tipo" filled /></div>-->
+      </div>
       <!-- Formulario Adicional -->
       <div class="q-pa-xs"><q-input outlined v-model="formulario.direccion" label="Ubicacion" required/></div>
       <div class="q-pa-xs"><q-input outlined v-model="formulario.descripcion" label="Descripción" required/></div>
@@ -59,8 +63,14 @@ export default {
     data() {
         return {
             persona:{},
+            vehiculo:{},
+            delito:{detalle:''},
+            delitos:[],
             formulario:{imagen:null},
         }
+    },
+    mounted(){
+      this.getDelitos()
     },
     methods:{
       onFileAdded(files) {
@@ -68,6 +78,12 @@ export default {
           this.formulario.imagen = files[0]; // Guarda el primer archivo en la variable
         }
       },  
+      getDelitos(){
+        this.$api.get('delito').then(res=>{
+          console.log(res.data)
+          this.delitos=res.data
+        })
+      },
       getPersona(){
         if((this.persona.cedula).length > 4){
         this.$api.post('searchpersona',this.persona).then(res=>{
@@ -85,11 +101,48 @@ export default {
         }
       },
 
+      getVehiculo(){
+        if((this.vehiculo.placa).length > 4){
+        this.$api.post('searchvehiculo',this.vehiculo).then(res=>{
+          console.log(res.data)
+          if(res.data.success){
+              this.vehiculo.tipo=res.data.vehiculo.tipo
+              this.vehiculo.linea=res.data.vehiculo.linea
+              this.vehiculo.numero=res.data.vehiculo.numero
+              this.vehiculo.carnet=res.data.vehiculo.carnet
+              this.vehiculo.chofer=res.data.vehiculo.chofer
+          }
+          else{
+            this.vehiculo.tipo=''
+              this.vehiculo.linea=''
+              this.vehiculo.numero=''
+              this.vehiculo.carnet=''
+              this.vehiculo.chofer=''
+          }
+        })
+        }
+      },
+
       onSubmit(){
        // console.log(this.formulario)
         //return false
-        if(this.formulario.imagen==null)
+        if(this.formulario.imagen==null){
+          this.$q.notify({
+              message: 'Debe subir imagen/foto.',
+              color: 'red',
+              icon:'info'
+            })
           return false
+        }
+        if(this.delito.id==undefined)
+          {
+            this.$q.notify({
+              message: 'Debe seleccionar Infraccion.',
+              color: 'red',
+              icon:'info'
+            })
+            return false
+          }
         this.$q.loading.show()
         const formData = new FormData();
         formData.append('cedula', this.persona.cedula);
@@ -98,12 +151,16 @@ export default {
         formData.append('telefono', this.persona.telefono);
         formData.append('direccion', this.formulario.direccion);
         formData.append('descripcion', this.formulario.descripcion);
+        formData.append('placa', this.vehiculo.placa);
+        formData.append('delito_id', this.delito.id);
         if (this.formulario.imagen) {
           formData.append('imagen', this.formulario.imagen);
         }
 
         this.$api.post('formulario',formData).then(()=>{
           this.persona={}          
+          this.vehiculo={}          
+          this.delito={detalle:''}
           this.$refs.uploader.removeFile(this.formulario.imagen); 
           this.formulario={imagen:null}
           this.$q.notify({

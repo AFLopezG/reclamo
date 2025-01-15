@@ -49,6 +49,7 @@ export default {
                 {label:'NOMBRE',name:'nombre',field:'nombre'},
                 {label:'TELEFONO',name:'telefono',field:'telefono'},
                 {label:'IMAGEN',name:'imagen',field:'imagen'},
+                {label:'PLACA',name:'placa',field:'placa'},
                 {label:'DIRECCION',name:'direccion',field:'direccion'},
                 {label:'DESCRIPCION',name:'descripcion',field:'descripcion'},
             ]
