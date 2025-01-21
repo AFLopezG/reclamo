@@ -23,7 +23,7 @@
             <q-item-label header class="text-center text-bold bg-blue-8 text-white">
             Opciones
           </q-item-label>
-          <q-item clickable dense to="/" exact active-class="bg-primary text-white">
+          <q-item clickable dense to="/navegador" exact active-class="bg-primary text-white">
             <q-item-section avatar><q-icon name="home" /></q-item-section>
             <q-item-section><q-item-label>Principal</q-item-label><q-item-label caption class="text-grey-2"></q-item-label></q-item-section>
         </q-item>

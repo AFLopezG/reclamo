@@ -43,7 +43,7 @@ import {globalStore} from 'stores/globalStore'
     mounted () {
       console.log(this.$url)
       if (this.store.isLoggedIn) {
-        this.$router.push('/')
+        this.$router.push('/navegador')
       }
     }, 
     methods: {

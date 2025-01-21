@@ -8,7 +8,7 @@ import Login from 'pages/Login.vue'
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/',
+    path: '/navegador',
     component: MainLayout,
     children: [
       { path: '', component: IndexPage, meta: { requiresAuth: true }},
@@ -17,7 +17,7 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
-    path:'/reclamo',
+    path:'/',
     component: Reclamo,
 
   },

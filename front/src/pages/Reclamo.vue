@@ -1,33 +1,32 @@
 <template>
-    <q-layout view="lHh Lpr lFf" class="bg-grey-2">
-      <q-page-container>
+    <q-layout view="lHh Lpr lFf" >
+      <q-page-container class="dynamic-bg q-pa-sm">
         <q-page>
+          <br><br>
+          <br><br>
+          <br><br>
+          <br>
+          <br><br>
           <div class="row">
             <div class="col-12 q-pa-lg">
-              <div class="text-h4 text-center q-pa-xs text-black text-bold">RECLAMO <br><span style="font-size: 12px;">AUTORIDAD DE TRANSPORTE MUNICIPAL</span>   </div>
-            <q-card class="my-card">
-      <q-card-section class="bg-primary text-white">
-        <div class="text-h6">FORMULARIO</div>
-      </q-card-section>
+
 
       <q-separator />
         <q-form @submit="onSubmit" class="q-gutter-md">
       <!-- Datos de Persona -->
        <div class="row">
-        <div class="col-12 q-pa-xs"><q-input outlined v-model="persona.cedula" label="Cédula" @update:model-value="getPersona()" type="number" required/></div>
-        <!--<div class="col-4 q-pa-xs"><q-input outlined v-model="persona.comp" label="Comp" @update:model-value="getPersona()" /></div>-->
-        <div class="col-12 q-pa-xs"><q-input outlined v-model="persona.nombre" label="Nombre" required/></div>
-        <div class="col-12 q-pa-xs"><q-input outlined v-model="persona.telefono" label="Teléfono" type="number" required/></div>
-       </div>
+        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense rounded outlined v-model="persona.cedula" label="Cédula" @update:model-value="getPersona()" type="number" required/></div>
+        <!--<div class="col-4 q-pa-xs"><q-input bg-color="white" rounded outlined v-model="persona.comp" label="Comp" @update:model-value="getPersona()" /></div>-->
+        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense rounded outlined v-model="persona.nombre" label="Nombre" required/></div>
+        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="persona.telefono" label="Teléfono" type="number" required/></div>
 
-      <div class="row">
-        <div class="col-12 q-pa-xs"><q-input outlined v-model="vehiculo.placa" type="text" label="PLACA" required/></div>
-        <div class="col-12 q-pa-xs"><q-select outlined v-model="delito" :options="delitos" label="Infraccion"  option-label="detalle"/></div>
+        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="vehiculo.placa" type="text" label="PLACA" required/></div>
+        <div class="col-12 q-pa-xs"><q-select bg-color="white" dense  rounded outlined v-model="delito" :options="delitos" label="Infraccion"  option-label="detalle"/></div>
         <!--<div class="col-6"><q-select v-model="vehiculo.tipo" :options="['Taxi','Mini/Trufi','Microbus']" label="Tipo" filled /></div>-->
-      </div>
       <!-- Formulario Adicional -->
-      <div class="q-pa-xs"><q-input outlined v-model="formulario.direccion" label="Ubicacion" required/></div>
-      <div class="q-pa-xs"><q-input outlined v-model="formulario.descripcion" label="Descripción" required/></div>
+      <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="formulario.direccion" label="Ubicacion" required/></div>
+      <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="formulario.descripcion" label="Descripción" required/></div>
+    </div>
 
       <!-- Cargar Archivos -->
        <div align="center">       
@@ -42,15 +41,15 @@
       />
       </div>
       <!-- Previsualización -->
-      <div v-if="formulario.imagen">
+      <div v-if="formulario.imagen"> 
         <q-img :src="formulario.imagen" class="q-mb-md" :style="{ maxWidth: '200px' }" />
       </div>
 
       <!-- Botón de Enviar -->
-      <div class="col-12"><q-btn label="Enviar" type="submit" icon="send" color="green" class="full-width" /></div>
+      <div class="col-12 text-center"><q-btn dense  rounded label="Enviar su Reclamo" type="submit" icon="send" color="green"  size="15px"/></div>
     </q-form>
 
-  </q-card></div>
+  </div>
 </div>
 </q-page>
       </q-page-container>
@@ -191,4 +190,33 @@ export default {
       -webkit-appearance: none;
       -moz-appearance: none;
     }
+  .bg-small {
+    background-image: url('/img/movil.png');
+    background-size: contain;
+    background-position: center;
+  }
+
+  .bg-large {
+    background-image: url('/img/pc.png');
+    background-size: 10%;
+    background-position: center;
+  }
+
+  @media (min-width: 768px) {
+    /* Aplica este estilo para pantallas más grandes */
+    .dynamic-bg {
+      background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-image: url('/img/pc.png');
+    }
+  }
+
+  @media (max-width: 767px) {
+    /* Aplica este estilo para pantallas pequeñas */
+    .dynamic-bg {
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+      background-image: url('/img/movil.png');
+    }
+  }
 </style>
