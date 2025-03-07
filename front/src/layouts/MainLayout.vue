@@ -29,9 +29,10 @@
         </q-item>
         <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="people" label="Usuarios" to="/usuario" expand-icon="null" v-if="store.user.id==1"/>
         <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="summarize" label="Reporte" to="/reporte" expand-icon="null" />
+        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="airport_shuttle" label="Inspecion" to="/inspeccion" expand-icon="null" />
       
 
-
+        
       </q-list>
     </q-drawer>
 

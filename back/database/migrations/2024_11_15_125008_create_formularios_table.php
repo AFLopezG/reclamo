@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('fecha');
             $table->time('hora');
             $table->string('direccion');
-            $table->text('descripcion');
+            $table->text('descripcion')->nullable();
             $table->string('imagen')->nullable();
             $table->string('cedula');
            // $table->string('comp')->nullable();

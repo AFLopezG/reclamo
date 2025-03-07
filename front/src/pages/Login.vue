@@ -64,7 +64,7 @@ import {globalStore} from 'stores/globalStore'
           this.store.isLoggedIn = true
           this.$api.defaults.headers.common.Authorization = 'Bearer ' + res.data.token
           localStorage.setItem('tokenReclamo', res.data.token)
-          this.$router.push('/')
+          this.$router.push('/navegador')
         }).catch(error => {
           console.log(error)
           this.$q.notify({

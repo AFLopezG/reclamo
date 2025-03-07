@@ -26,6 +26,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('logout', [App\Http\Controllers\UserController::class, 'logout']);
     Route::post('cambioEstado/{id}', [App\Http\Controllers\UserController::class, 'cambioEstado']);
     Route::apiResource('user', App\Http\Controllers\UserController::class);
-
+    Route::apiResource('propietario', App\Http\Controllers\PropietarioController::class);
+    Route::apiResource('inspection', App\Http\Controllers\InspectionController::class);
+    Route::apiResource('vehicle', App\Http\Controllers\VehicleController::class);
+    Route::get('listTipo', [App\Http\Controllers\VehicleController::class,'listTipo']);
+    Route::get('listMarca', [App\Http\Controllers\VehicleController::class,'listMarca']);
+    Route::get('listModelo', [App\Http\Controllers\VehicleController::class,'listModelo']);
+    Route::get('listLinea', [App\Http\Controllers\VehicleController::class,'listLinea']);
+    Route::get('listInsp/{fecha}', [App\Http\Controllers\InspectionController::class,'listInsp']);
     Route::post('reportFecha',[\App\Http\Controllers\FormularioController::class,'reportFecha']); 
 });

@@ -17,25 +17,25 @@
        <div class="row">
         <div class="col-12 q-pa-xs"><q-input bg-color="white" dense rounded outlined v-model="persona.cedula" label="Cédula" @update:model-value="getPersona()" type="number" required/></div>
         <!--<div class="col-4 q-pa-xs"><q-input bg-color="white" rounded outlined v-model="persona.comp" label="Comp" @update:model-value="getPersona()" /></div>-->
-        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense rounded outlined v-model="persona.nombre" label="Nombre" required/></div>
-        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="persona.telefono" label="Teléfono" type="number" required/></div>
+        <div class="col-12 q-pa-xs"><q-input style="text-transform: uppercase;" bg-color="white" dense rounded outlined v-model="persona.nombre" label="Nombre" required/></div>
+        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="persona.telefono" label="Teléfono" type="number" /></div>
 
-        <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="vehiculo.placa" type="text" label="PLACA" required/></div>
+        <div class="col-12 q-pa-xs"><q-input style="text-transform: uppercase;" bg-color="white" dense  rounded outlined v-model="vehiculo.placa" type="text" label="PLACA" required/></div>
         <div class="col-12 q-pa-xs"><q-select bg-color="white" dense  rounded outlined v-model="delito" :options="delitos" label="Infraccion"  option-label="detalle"/></div>
         <!--<div class="col-6"><q-select v-model="vehiculo.tipo" :options="['Taxi','Mini/Trufi','Microbus']" label="Tipo" filled /></div>-->
       <!-- Formulario Adicional -->
       <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="formulario.direccion" label="Ubicacion" required/></div>
-      <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="formulario.descripcion" label="Descripción" required/></div>
+      <div class="col-12 q-pa-xs"><q-input bg-color="white" dense  rounded outlined v-model="formulario.descripcion" label="Descripción" /></div>
     </div>
 
       <!-- Cargar Archivos -->
        <div align="center">       
         <q-uploader
+        color="red-14"
         label="Cargar Imagen"
         v-model="formulario.imagen"
         accept="image/*"
         @added="onFileAdded"
-        :max-file-size="2000000"
         ref="uploader"
         :rules="[files => files.length > 0 || 'La imagen es requerida']"
       />
@@ -122,61 +122,61 @@ export default {
         }
       },
 
-      onSubmit(){
-       // console.log(this.formulario)
-        //return false
-        if(this.formulario.imagen==null){
-          this.$q.notify({
-              message: 'Debe subir imagen/foto.',
-              color: 'red',
-              icon:'info'
-            })
-          return false
-        }
-        if(this.delito.id==undefined)
-          {
+        onSubmit(){
+        // console.log(this.formulario)
+          //return false
+          if(this.formulario.imagen==null){
             this.$q.notify({
-              message: 'Debe seleccionar Infraccion.',
-              color: 'red',
-              icon:'info'
-            })
+                message: 'Debe subir imagen/foto.',
+                color: 'red',
+                icon:'info'
+              })
             return false
           }
-        this.$q.loading.show()
-        const formData = new FormData();
-        formData.append('cedula', this.persona.cedula);
-        formData.append('comp', this.persona.comp);
-        formData.append('nombre', this.persona.nombre);
-        formData.append('telefono', this.persona.telefono);
-        formData.append('direccion', this.formulario.direccion);
-        formData.append('descripcion', this.formulario.descripcion);
-        formData.append('placa', this.vehiculo.placa);
-        formData.append('delito_id', this.delito.id);
-        if (this.formulario.imagen) {
-          formData.append('imagen', this.formulario.imagen);
+          if(this.delito.id==undefined)
+            {
+              this.$q.notify({
+                message: 'Debe seleccionar Infraccion.',
+                color: 'red',
+                icon:'info'
+              })
+              return false
+            }
+          this.$q.loading.show()
+          const formData = new FormData();
+          formData.append('cedula', this.persona.cedula);
+          formData.append('comp', this.persona.comp);
+          formData.append('nombre', this.persona.nombre);
+          formData.append('telefono', this.persona.telefono);
+          formData.append('direccion', this.formulario.direccion);
+          formData.append('descripcion', this.formulario.descripcion);
+          formData.append('placa', this.vehiculo.placa);
+          formData.append('delito_id', this.delito.id);
+          if (this.formulario.imagen) {
+            formData.append('imagen', this.formulario.imagen);
+          }
+
+          this.$api.post('formulario',formData).then(()=>{
+            this.persona={}          
+            this.vehiculo={}          
+            this.delito={detalle:''}
+            this.$refs.uploader.removeFile(this.formulario.imagen); 
+            this.formulario={imagen:null}
+            this.$q.notify({
+            message: 'Registado reclamo',
+            color: 'green',
+            icon:'check_circle_outline'
+          })
+          }).catch(error=> {
+            this.$q.notify({
+            message: error.message,
+            color: 'red',
+            icon:'info'
+          })
+          }).finally(() => this.$q.loading.hide())
+
+          return false;
         }
-
-        this.$api.post('formulario',formData).then(()=>{
-          this.persona={}          
-          this.vehiculo={}          
-          this.delito={detalle:''}
-          this.$refs.uploader.removeFile(this.formulario.imagen); 
-          this.formulario={imagen:null}
-          this.$q.notify({
-          message: 'Registado reclamo',
-          color: 'green',
-          icon:'check_circle_outline'
-        })
-        }).catch(error=> {
-          this.$q.notify({
-          message: error.message,
-          color: 'red',
-          icon:'info'
-        })
-        }).finally(() => this.$q.loading.hide())
-
-        return false;
-      }
     }
 }
 </script>

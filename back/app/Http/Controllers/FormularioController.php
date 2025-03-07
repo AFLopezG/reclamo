@@ -59,9 +59,9 @@ class FormularioController extends Controller
             'cedula' => 'required',
             //'comp' => '',
             'nombre' => 'required',
-            'telefono' => 'required',
+            'telefono' => '',
             'direccion' => 'required',
-            'descripcion' => 'required',
+            'descripcion' => '',
             'placa'=> 'required',
             'tipo'=> '',
             'linea'=> '',
@@ -69,7 +69,7 @@ class FormularioController extends Controller
             'carnet'=> '',
             'chofer'=> '',
             'delito_id'=>'required',
-            'imagen' => 'nullable|image|max:2048',
+            'imagen' => 'nullable|image',
         ]);
 
         //if($request->comp=='' || $request->comp==null)
@@ -81,7 +81,7 @@ class FormularioController extends Controller
         if ($persona) {
             // Actualizar datos de la persona si ya existe
             $persona->update([
-                'nombre' => strtoupper($request->nombre) ?? $persona->nombre,
+                'nombre' => strtoupper($request->nombre) ?? strtoupper($persona->nombre),
                 'telefono' => $request->telefono ?? $persona->telefono,
             ]);
         } else {
@@ -124,7 +124,7 @@ class FormularioController extends Controller
             //'comp' => $persona->comp,
             'nombre' => $persona->nombre,
             'telefono' => $persona->telefono,
-            'placa' => $vehiculo->placa,
+            'placa' => strtoupper($vehiculo->placa),
             'vehiculo_id' => $vehiculo->id, 
         ]);
 
@@ -137,7 +137,7 @@ class FormularioController extends Controller
             // Redimensionar la imagen usando ImageManager de Intervention
             $image = ImageManager::imagick()->read($imagen->getRealPath());
             $image->scale(800, 800);
-            $image->save(public_path('/imagenes/'.$nombreImagen));
+            $image->save(public_path('imagenes/'.$nombreImagen));
     
             // Guardar el nombre de la imagen en la base de datos
             $formulario->update(['imagen' => $nombreImagen]);
