@@ -17,6 +17,7 @@
             <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
               <div class="row">
                 <div class="col-12"><q-input outlined v-model="dato.nombre"   type="text" label="Nombre " hint="Ingresar Nombre" dense lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"/></div>
+                <div class="col-12"><q-select outlined v-model="dato.rol" :options="roles" label="Rol " dense lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"/></div>
                 <div class="col-12"><q-input outlined dense v-model="dato.email" type="email" label="Email" hint="Correo electronico" lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']" /></div>
                 <div class="col-12"><q-input outlined dense v-model="dato.name" label="Cuenta" hint="Cuenta" lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']" /></div>
                 <div class="col-12"><q-input outlined dense v-model="dato.password" label="Contraseña" hint="Contraseña" lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']" :type="typePassword?'password':'text'">
@@ -101,6 +102,7 @@
     data () {
       return {
         store:globalStore(),
+        roles: ['ADMINISTRADOR', 'USUARIO', 'INSPECTOR'],
         alert: false,
         dialog_mod: false,
         dialog_del: false,
@@ -117,6 +119,7 @@
         columns: [
           { name: 'opcion', label: 'OPCIÓN', field: 'action', sortable: false },
           { name: 'name', align: 'left', label: 'NOMBRE ', field: 'name', sortable: true },
+          { name: 'rol', align: 'left', label: 'ROL ', field: 'rol', sortable: true },
           { name: 'email', align: 'left', label: 'E-MAIL', field: 'email', sortable: true },
           { name: 'estado', align: 'left', label: 'ESTADO', field: 'state', sortable: true },
         ],
@@ -158,12 +161,7 @@
       onSubmit () {
 
         this.$q.loading.show()
-        this.$api.post('user', {
-          name: this.dato.name,
-          nombre: this.dato.nombre,
-          password: this.dato.password,
-          email: this.dato.email,
-        }).then(() => {
+        this.$api.post('user', this.dato).then(() => {
           // console.log(res.data)
           this.$q.notify({
             color: 'green-4',

@@ -281,7 +281,7 @@ export default {
             <br>
             <br>
             <table class="tab3">
-                <tr><td>INSPECTOR</td><td style="width:20%; border:0"></td><td>PROPIETARIO</td></tr>
+                <tr><td style='width:40%'>INSPECTOR<br>${dato.user.nombre}</td><td style="width:20%; border:0"></td><td style='width:40%'>PROPIETARIO<br>${dato.propietario.nombre}</td></tr>
             </table>
             </div>`
             document.getElementById('myelement').innerHTML = cadena
@@ -330,9 +330,9 @@ export default {
             })
         },
         formulario(){
-            this.propietario={};
+            this.propietario={'seguro':'SOAT'};
             this.vehiculo={};
-            this.inspeccion={};
+            this.inspeccion={'calificacion':'NO CUMPLE'};
             this.dialogRegistro=true;
         },
         getTipos(){

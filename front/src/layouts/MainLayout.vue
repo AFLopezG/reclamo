@@ -27,9 +27,9 @@
             <q-item-section avatar><q-icon name="home" /></q-item-section>
             <q-item-section><q-item-label>Principal</q-item-label><q-item-label caption class="text-grey-2"></q-item-label></q-item-section>
         </q-item>
-        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="people" label="Usuarios" to="/usuario" expand-icon="null" v-if="store.user.id==1"/>
-        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="summarize" label="Reporte" to="/reporte" expand-icon="null" />
-        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="airport_shuttle" label="Inspecion" to="/inspeccion" expand-icon="null" />
+        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="people" label="Usuarios" to="/usuario" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR'"/>
+        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="summarize" label="Reporte" to="/reporte" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR' || store.user.rol=='USUARIO'"/>
+        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="airport_shuttle" label="Inspecion" to="/inspeccion" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR' || store.user.rol=='INSPECTOR'"/>
       
 
         

@@ -67,7 +67,7 @@ export default {
                 link.setAttribute('download', 'reporte_'+r+'.pdf'); // Nombre del archivo
                 document.body.appendChild(link);
                 link.click();  
-            }).catch(error=>{
+            }).catch(()=>{
                 alert('error');
             })
                 

@@ -28,6 +28,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required',
+            'rol' => 'required',
         ]);
         
         $validated['password']=Hash::make($validated['password']);
@@ -53,6 +54,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required',
             'nombre' => 'required',
+            'rol' => 'required',
             'email' => 'required|email',
         ]);
         
