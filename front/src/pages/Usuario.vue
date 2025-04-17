@@ -102,7 +102,7 @@
     data () {
       return {
         store:globalStore(),
-        roles: ['ADMINISTRADOR', 'USUARIO', 'INSPECTOR'],
+        roles: ['ADMINISTRADOR', 'USUARIO', 'INSPECTOR','CHOFER'],
         alert: false,
         dialog_mod: false,
         dialog_del: false,

@@ -29,7 +29,8 @@
         </q-item>
         <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="people" label="Usuarios" to="/usuario" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR'"/>
         <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="summarize" label="Reporte" to="/reporte" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR' || store.user.rol=='USUARIO'"/>
-        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="airport_shuttle" label="Inspecion" to="/inspeccion" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR' || store.user.rol=='INSPECTOR'"/>
+        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="airport_shuttle" label="Inspecion" to="/inspeccion" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR' || store.user.rol=='USUARIO'"/>
+        <q-expansion-item  active-class="bg-primary text-white" dense exact expand-separator icon="map" label="Posicion Personal" to="/posicion" expand-icon="null" v-if="store.user.rol=='ADMINISTRADOR' || store.user.rol=='USUARIO'"/>
       
 
         

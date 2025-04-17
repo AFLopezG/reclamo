@@ -7,6 +7,7 @@ use App\Models\Propietario;
 use App\Models\Vehicle;
 use App\Http\Requests\StoreInspectionRequest;
 use App\Http\Requests\UpdateInspectionRequest;
+use Illuminate\Http\Request;
 
 class InspectionController extends Controller
 {
@@ -42,7 +43,7 @@ class InspectionController extends Controller
             $propietario = new Propietario();
             $propietario->cedula = strtoupper($request->propietario['cedula']);
             $propietario->nombre = strtoupper($request->propietario['nombre']);
-            $propietario->categoria = strtoupper($request->propietario['categoria']);
+            $propietario->categoria = strtoupper($request->propietario['categoria']==null?$request->propietario['categoria']:'');
             $propietario->seguro = strtoupper($request->propietario['seguro']);
             $propietario->save();
         }
@@ -50,7 +51,7 @@ class InspectionController extends Controller
         {
             $propietario->nombre = strtoupper($request->propietario['nombre']);
             $propietario->seguro = strtoupper($request->propietario['seguro']);
-            $propietario->categoria = strtoupper($request->propietario['categoria']);
+            $propietario->categoria = strtoupper($request->propietario['categoria']==null?$request->propietario['categoria']:'');
             $propietario->save();
         }
 
@@ -113,9 +114,21 @@ class InspectionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateInspectionRequest $request, Inspection $inspection)
+    public function actualizar(Request $request)
     {
         //
+
+        $propietario= Propietario::where('cedula',strtoupper($request->propietario['cedula']))->first();
+        if(isset($propietario))
+        {
+            $propietario->nombre = strtoupper($request->propietario['nombre']);
+            $propietario->save();
+        }
+
+        $inspeccion =  Inspection::find($request->id);
+        $inspeccion->observacion=$request->observacion;
+        $inspeccion->radicatoria=$request->radicatoria;
+        $inspeccion->save();
     }
 
     /**

@@ -6,6 +6,7 @@ import Reporte from 'pages/Reporte.vue'
 import Usuario from 'pages/Usuario.vue'
 import Login from 'pages/Login.vue'
 import Inspeccion from 'pages/Inspeccion.vue'
+import Posicion from 'pages/Posicion.vue'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -15,7 +16,8 @@ const routes: RouteRecordRaw[] = [
       { path: '', component: IndexPage, meta: { requiresAuth: true }},
       { path: '/usuario', component: Usuario, },
       { path: '/reporte', component: Reporte, },
-      { path: '/inspeccion', component: Inspeccion, }
+      { path: '/inspeccion', component: Inspeccion, },
+      { path: '/posicion', component: Posicion, }
     ],
   },
   {

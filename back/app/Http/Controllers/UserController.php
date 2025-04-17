@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use ElephantIO\Client;
+use Exception;
 
 class UserController extends Controller
 {
@@ -108,8 +110,26 @@ class UserController extends Controller
                 return $user;
     }
 
+    public function listPosicion(){
+        return  User::where('lat', '<>', '0')
+        ->where('lng', '<>', '0')
+        ->get();
+    }
+
+
     public function logout(Request $request)
     {
+        $user=User::find($request->id);
+        if ($user && $user->id != null) {
+            // Crear un nuevo Request con los datos y llamarlo en el mismo controlador
+            $request2 = new Request([
+                'id' => $user->id,
+                'lat' => 0,
+                'lng' => 0
+            ]);
+    
+            $this->actualizarPosicion($request2);
+        }
         $request->user()->tokens()->delete();
         return response(['message' => 'Sesión cerrada']);
     }
@@ -122,4 +142,53 @@ class UserController extends Controller
             $user->estado='ACTIVO';
         $user->save();
     }
+
+    public function actualizarPosicion(Request $request)
+    {
+        // Validar datos de la solicitud
+        $request->validate([
+            'id' => 'required',
+            'lat' => 'required',
+            'lng' => 'required',
+        ]);
+
+        // Buscar conjunto en la base de datos
+        $user = User::where('id',$request->id)->where('estado','ACTIVO')->first();
+        if (!$user) {
+            return response()->json(['error' => 'Usuario no encontrado'], 404);
+        }
+
+        // Actualizar coordenadas en la base de datos
+        $user->lat = $request->lat;
+        $user->lng = $request->lng;
+
+        $user->save();
+
+        $datos = [
+            'id' => $user->id,
+            'lat' => $user->lat,
+            'lng' => $user->lng,
+            'nombre' => $user->nombre
+        ];
+        //dd($datos);
+
+        $url = env('URL_SOCKET', 'http://localhost:4000');
+        error_log("🔗 Intentando conectar con: " . $url);
+        
+            $client = new Client(Client::engine(Client::CLIENT_4X, $url));
+            $client->initialize();
+            error_log("✅ Conexión establecida con el servidor Socket.IO");
+        
+            $client->of('/');
+            error_log("📡 Enviando datos: " . json_encode($datos));
+        
+            $client->emit('actualizarPosicion', $datos); 
+            error_log("📨 Datos enviados correctamente");
+        
+            $client->close();
+            error_log("🔌 Conexión cerrada");
+        
+            return response()->json(['success' => true, 'message' => 'Posición actualizada en ' . json_encode($datos)], 200);
+    }
+
 }

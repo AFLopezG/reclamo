@@ -20,6 +20,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('estado')->default('ACTIVO');
+            $table->string("lat")->default("0");
+            $table->string("lng")->default("0");
             $table->rememberToken();
             $table->timestamps();
         });

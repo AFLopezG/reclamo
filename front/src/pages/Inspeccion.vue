@@ -21,7 +21,8 @@
         </template>
         <template v-slot:body-cell-op="props">
             <q-td key="op" :props="props">
-                <q-btn color="info" icon="print" dense @click="impresion(props.row)"/>
+                <q-btn color="orange" icon="edit" @click="editar(props.row)" dense flat v-if="props.row.user.id==store.user.id"/>
+                <q-btn color="info" icon="print"  @click="impresion(props.row)" dense flat/>
             </q-td>
         </template>
     </q-table>
@@ -39,7 +40,7 @@
                     <div class="row">
                         <div class="col-12 text-bold text-h6">DATOS DE PROPIETARIO</div>
                         <div class="col-md-5 col-xs-12 q-pa-xs"><q-input style="text-transform: uppercase;" v-model="propietario.cedula" label="Cedula" outlined dense required @update:model-value="buscaProp" placeholder="99999-XX"/></div>
-                        <div class="col-md-5 col-xs-12 q-pa-xs"><q-select v-model="propietario.categoria" label="Categoria" :options="['A','B','C']" outlined dense required/></div>
+                        <div class="col-md-5 col-xs-12 q-pa-xs"><q-select v-model="propietario.categoria" label="Categoria" :options="['','A','B','C']" outlined dense/></div>
                         <div class="col-md-2 col-xs-12 q-pa-xs"><q-toggle v-model="propietario.seguro" :label="'Seguro '+ propietario.seguro" color="green" false-value="FOCAT" true-value="SOAT" outlined dense required/></div>
                         <div class="col-md-12 col-xs-12 q-pa-xs"><q-input style="text-transform: uppercase;" v-model="propietario.nombre" label="Nombre" outlined dense required/></div>
                     </div>
@@ -148,6 +149,37 @@
             </q-form>
         </q-card>
     </q-dialog>
+
+    <q-dialog v-model="dialogMod" full-width>
+        <q-card>
+            <q-card-section class="row items-center">
+                <q-avatar icon="car_repair" color="primary" text-color="white" size="sm"/>
+                <span class="q-ml-sm">Modificacion Registro Inspecion.</span>
+            </q-card-section>
+            <q-form
+                @submit="onMod"
+            >                
+                <q-card-section>
+                    <div class="row">
+                        <div class="col-12 text-bold text-h6">DATOS DE PROPIETARIO</div>
+                        <div class="col-md-5 col-xs-12 q-pa-xs"><q-input style="text-transform: uppercase;" v-model="propietario.cedula" label="Cedula" outlined dense required readonly placeholder="99999-XX"/></div>
+                        <div class="col-md-12 col-xs-12 q-pa-xs"><q-input style="text-transform: uppercase;" v-model="propietario.nombre" label="Nombre" outlined dense required/></div>
+                    </div>
+
+                </q-card-section>
+                <q-card-section>
+                    <div class="row">
+                        <div class="col-md-12 col-xs-12 q-pa-xs"><q-input v-model="inspeccion.observacion" label="OBSERVACION" type="textarea" outlined dense/></div>
+                        <div class="col-md-6 col-xs-12 q-pa-xs"><q-input v-model="inspeccion.radicatoria" label="Radicatoria" outlined dense/></div>
+                    </div>
+                </q-card-section>
+            <q-card-actions align="right">
+                <q-btn flat label="Cancelar" color="red" v-close-popup />
+                <q-btn flat label="MODIFICAR" color="yellow" type="submit" />
+            </q-card-actions>
+            </q-form>
+        </q-card>
+    </q-dialog>
     <div id="myelement" class="hidden"></div>
 
     </q-page>
@@ -155,12 +187,15 @@
 <script>
 import { date } from 'quasar';
 import { Printd } from 'printd'
+import {globalStore} from 'stores/globalStore'
 
 export default {
     name:'inspeccionPage',
     data() {
         return {
+            store: globalStore(),
             filter:'',
+            dialogMod:false,
             fecha: date.formatDate(new Date(), 'YYYY-MM-DD'),
             tipos:[],
             marcas:[],
@@ -193,6 +228,20 @@ export default {
         this.getInspecciones();
     },
     methods:{
+        onMod(){
+            this.inspeccion.propietario=this.propietario
+            this.$api.post('actualizar',this.inspeccion).then(()=>{
+                this.dialogMod=false
+                this.getInspecciones()
+            })
+                
+        },
+        editar(dt){
+            this.propietario=dt.propietario
+            this.inspeccion=dt
+            this.dialogMod=true
+            console.log(dt)
+        },
         impresion(dato){
             let cadena=`<style>
             .imag1{
@@ -295,6 +344,9 @@ export default {
                 if(response.data){
                 this.propietario=response.data;
                 }
+                else{
+                    this.propietario={cedula:carnet,'seguro':'SOAT'}
+                }
             })
         },
         buscaVehi(){
@@ -303,6 +355,10 @@ export default {
             this.$api.get('vehicle/'+placa).then(response=>{
                 if(response.data){
                     this.vehiculo=response.data;
+                }
+                else
+                {
+                    this.vehiculo={'placa':placa}
                 }
             })
         },
@@ -317,6 +373,7 @@ export default {
                 return;
             }
             console.log(this.inspeccion)
+            if(this.propietario.categoria==undefined) this.propietario.categoria=''
             this.inspeccion.propietario=this.propietario;
             this.inspeccion.vehicle=this.vehiculo;
             this.$api.post('inspection',this.inspeccion).then(response=>{

@@ -35,4 +35,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('listLinea', [App\Http\Controllers\VehicleController::class,'listLinea']);
     Route::get('listInsp/{fecha}', [App\Http\Controllers\InspectionController::class,'listInsp']);
     Route::post('reportFecha',[\App\Http\Controllers\FormularioController::class,'reportFecha']); 
+    Route::post('actualizar',[\App\Http\Controllers\InspectionController::class,'actualizar']); 
+    Route::post('actualizarPosicion',[\App\Http\Controllers\UserController::class,'actualizarPosicion']);     
+    Route::get('listPosicion',[\App\Http\Controllers\UserController::class,'listPosicion']);     
+    
 });
