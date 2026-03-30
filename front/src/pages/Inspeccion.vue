@@ -1,31 +1,41 @@
 <template>
-    <q-page paddding>
-        <div class="text-h5 text-bold text-center">INSPECCION VEHICULAR </div>
-        <div class="row">
-            <div class="col-4 q-pa-xs"><q-input v-model="fecha" type="date" label="Fecha" outlined dense/></div>
-            <div class="col-2 q-pa-xs" ><q-btn color="info" icon="search"  @click="getInspecciones"  dense/></div>
+    <q-page class="admin-page">
+        <div class="admin-hero q-pa-md q-mb-md">
+            <div class="row items-center q-col-gutter-md">
+                <div class="col-12 col-md-6">
+                    <div class="text-h5 text-weight-bold">Inspección vehicular</div>
+                    <div class="text-caption admin-subtitle">Registro y seguimiento de inspecciones</div>
+                </div>
+                <div class="col-12 col-md-6 admin-actions">
+                    <q-input v-model="fecha" type="date" label="Fecha" outlined dense />
+                    <q-btn color="info" icon="search" label="Buscar" @click="getInspecciones" dense />
+                    <q-btn v-if="$store.hasPerm('inspeccion.editar')" color="positive" icon="check" label="Registrar" @click="formulario" />
+                </div>
+            </div>
         </div>
-        <q-table
-            :rows="inspecciones"
-            :columns="columns"
-            row-key="name"
-            :filter="filter"
-        >
-        <template v-slot:top-right>
-            <q-btn color="green" icon="check" label="REGISTRAR" @click="formulario" />
-            <q-input outlined dense debounce="300" v-model="filter" placeholder="Search">
-                <template v-slot:append>
-                    <q-icon name="search" />
-                </template>
-            </q-input>
-        </template>
-        <template v-slot:body-cell-op="props">
-            <q-td key="op" :props="props">
-                <q-btn color="orange" icon="edit" @click="editar(props.row)" dense flat v-if="props.row.user.id==store.user.id"/>
-                <q-btn color="info" icon="print"  @click="impresion(props.row)" dense flat/>
-            </q-td>
-        </template>
-    </q-table>
+
+        <q-card flat bordered class="admin-card">
+            <q-card-section class="row items-center q-pb-sm">
+                <div class="text-subtitle1 text-weight-medium">Listado</div>
+                <q-space />
+                <q-input outlined dense debounce="300" v-model="filter" class="admin-search" placeholder="Buscar">
+                    <template v-slot:append>
+                        <q-icon name="search" />
+                    </template>
+                </q-input>
+            </q-card-section>
+            <q-separator />
+            <q-card-section class="q-pa-none">
+                <q-table dense flat :rows="inspecciones" :columns="columns" row-key="name" :filter="filter">
+                    <template v-slot:body-cell-op="props">
+                        <q-td key="op" :props="props">
+                            <q-btn v-if="$store.hasPerm('inspeccion.editar') && props.row.user.id==store.user.id" color="orange" icon="edit" @click="editar(props.row)" dense flat />
+                            <q-btn color="info" icon="print" @click="impresion(props.row)" dense flat />
+                        </q-td>
+                    </template>
+                </q-table>
+            </q-card-section>
+        </q-card>
 
     <q-dialog v-model="dialogRegistro" full-width>
         <q-card>
@@ -221,6 +231,10 @@ export default {
         }
     },
     created() {
+        if (!this.$store.hasPerm('inspeccion.ver')) {
+            this.$router.replace('/navegador')
+            return
+        }
         this.getTipos();
         this.getMarcas();
         this.getModelos();

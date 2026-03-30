@@ -1,1 +1,84 @@
 // app global css in SCSS form
+
+:root {
+  --app-bg: #f7f9fc;
+  --app-text: rgba(18, 38, 63, 0.92);
+  --app-muted: rgba(18, 38, 63, 0.7);
+  --app-border: rgba(18, 38, 63, 0.08);
+  --app-shadow: 0 12px 28px rgba(18, 38, 63, 0.08);
+  --app-shadow-soft: 0 10px 24px rgba(18, 38, 63, 0.08);
+}
+
+body {
+  color: var(--app-text);
+}
+
+.app-bg {
+  background: radial-gradient(1200px 420px at 10% 0%, rgba(23, 156, 171, 0.14), transparent 60%),
+    radial-gradient(1000px 420px at 90% 0%, rgba(25, 118, 210, 0.12), transparent 55%),
+    var(--app-bg);
+  min-height: 100%;
+}
+
+.admin-page {
+  @extend .app-bg;
+  padding: 16px;
+}
+
+.admin-hero {
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8));
+  box-shadow: var(--app-shadow-soft);
+}
+
+.admin-subtitle {
+  color: var(--app-muted);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.admin-search {
+  width: 360px;
+  max-width: 100%;
+}
+
+.admin-card {
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--app-shadow);
+}
+
+.admin-modal {
+  border-radius: 14px;
+}
+
+.admin-modal-header {
+  background: linear-gradient(135deg, rgba(25, 118, 210, 0.12), rgba(23, 156, 171, 0.12));
+}
+
+.public-page {
+  @extend .app-bg;
+  padding: 16px;
+}
+
+.public-card {
+  border-radius: 14px;
+  border: 1px solid var(--app-border);
+  box-shadow: var(--app-shadow);
+  overflow: hidden;
+}
+
+.q-table__top {
+  padding: 12px 14px;
+}
+
+.q-card--bordered {
+  border-color: var(--app-border);
+}

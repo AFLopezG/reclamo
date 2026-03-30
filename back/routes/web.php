@@ -16,3 +16,6 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/licencias/verificar/{codigo}', [App\Http\Controllers\LicenciaController::class, 'verifyPage'])
+    ->name('licencias.verify');

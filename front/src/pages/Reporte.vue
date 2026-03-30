@@ -1,35 +1,44 @@
 <template>
-    <q-page padding>
-        <div class="row">
-            <div class="col-4 q-pa-xs"><q-input dense outlined  v-model="report.ini" type="date" label="Fecha Ini" /></div>
-            <div class="col-4 q-pa-xs"><q-input dense outlined v-model="report.fin" type="date" label="Fecha Fin" /></div>
-            <div class="col-4 q-pa-xs"><q-btn color="primary" icon="search" @click="getFormulario" /></div>
+    <q-page class="admin-page">
+      <div class="admin-hero q-pa-md q-mb-md">
+        <div class="row items-center q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <div class="text-h5 text-weight-bold">Reporte</div>
+            <div class="text-caption admin-subtitle">Listado de reclamos por rango de fechas</div>
+          </div>
+          <div class="col-12 col-md-6 admin-actions">
+            <q-input dense outlined v-model="report.ini" type="date" label="Fecha ini" />
+            <q-input dense outlined v-model="report.fin" type="date" label="Fecha fin" />
+            <q-btn color="primary" icon="search" label="Buscar" @click="getFormulario" />
+          </div>
         </div>
-        <q-table
-            title="Listado Reclamos"
-            :rows="listado"
-            :columns="columns"
-            row-key="name"
-        >
-        <template v-slot:top-right>
-          <q-input outlined dense debounce="300" v-model="filter" placeholder="Search">
-            <template v-slot:append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
-        <template v-slot:body-cell-op="props">
-            <q-td key="op" :props="props">
-                    <q-btn color="info" icon="print" dense  @click="impresion(props.row.id)"/>
-            </q-td>
-        </template>
+      </div>
 
-        <template v-slot:body-cell-imagen="props">
-            <q-td key="imagen" :props="props">
-                    <q-btn color="cyan" icon="image" dense @click="verImagen(props.row.imagen)" v-if="props.row.imagen"/>
-            </q-td>
-        </template>
-    </q-table>
+      <q-card flat bordered class="admin-card">
+        <q-card-section class="row items-center q-pb-sm">
+          <div class="text-subtitle1 text-weight-medium">Listado</div>
+          <q-space />
+          <q-input outlined dense debounce="300" v-model="filter" class="admin-search" placeholder="Buscar">
+            <template v-slot:append><q-icon name="search" /></template>
+          </q-input>
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-pa-none">
+          <q-table dense flat :rows="listado" :columns="columns" row-key="name" :filter="filter">
+            <template v-slot:body-cell-op="props">
+              <q-td key="op" :props="props">
+                <q-btn color="info" icon="print" dense @click="impresion(props.row.id)" />
+              </q-td>
+            </template>
+
+            <template v-slot:body-cell-imagen="props">
+              <q-td key="imagen" :props="props">
+                <q-btn color="cyan" icon="image" dense @click="verImagen(props.row.imagen)" v-if="props.row.imagen" />
+              </q-td>
+            </template>
+          </q-table>
+        </q-card-section>
+      </q-card>
     </q-page>
 </template>
 <script>
@@ -39,6 +48,7 @@ export default {
     name:'reportePage',
     data() {
         return {
+            store: this.$store,
             filter:'',
             listado:[],
             report:{ini: date.formatDate(new Date(), 'YYYY-MM-DD'),fin: date.formatDate(new Date(), 'YYYY-MM-DD')},
@@ -56,6 +66,10 @@ export default {
         }
     },
     created(){
+        if (!this.$store.hasPerm('reporte.ver')) {
+          this.$router.replace('/navegador')
+          return
+        }
         this.getFormulario()
     },
     methods:{

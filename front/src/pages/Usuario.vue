@@ -1,12 +1,19 @@
 <template>
-    <div class="q-pa-md">
-      <q-btn
-        label="Nuevo usuario"
-        color="positive"
-        @click="regDialog"
-        icon="add_circle"
-        class="q-mb-xs"
-      />
+    <q-page class="admin-page">
+      <div class="admin-hero q-pa-md q-mb-md">
+        <div class="row items-center q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <div class="text-h5 text-weight-bold">Usuarios</div>
+            <div class="text-caption admin-subtitle">Gestión de cuentas del sistema</div>
+          </div>
+          <div class="col-12 col-md-6 admin-actions">
+            <q-input outlined dense debounce="300" v-model="filter" class="admin-search" placeholder="Buscar usuario">
+              <template v-slot:append><q-icon name="search" /></template>
+            </q-input>
+            <q-btn v-if="$store.hasPerm('usuarios.editar')" label="Nuevo usuario" color="positive" @click="regDialog" icon="add_circle" />
+          </div>
+        </div>
+      </div>
 
       <q-dialog v-model="alert" full-width>
         <q-card >
@@ -17,7 +24,7 @@
             <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
               <div class="row">
                 <div class="col-12"><q-input outlined v-model="dato.nombre"   type="text" label="Nombre " hint="Ingresar Nombre" dense lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"/></div>
-                <div class="col-12"><q-select outlined v-model="dato.rol" :options="roles" label="Rol " dense lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']"/></div>
+                <div class="col-12"><q-select outlined v-model="rol" :options="roles" label="Rol " option-label="nombre" dense /></div>
                 <div class="col-12"><q-input outlined dense v-model="dato.email" type="email" label="Email" hint="Correo electronico" lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']" /></div>
                 <div class="col-12"><q-input outlined dense v-model="dato.name" label="Cuenta" hint="Cuenta" lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']" /></div>
                 <div class="col-12"><q-input outlined dense v-model="dato.password" label="Contraseña" hint="Contraseña" lazy-rules :rules="[(val) => val.length > 0 || 'Por favor ingresa datos']" :type="typePassword?'password':'text'">
@@ -38,7 +45,15 @@
         </q-card>
       </q-dialog>
 
-      <q-table dense :filter="filter" title="REGISTRO DE USUARIOS" :rows="data" :columns="columns" row-key="name" :rows-per-page-options="[50,100]">
+      <q-card flat bordered class="admin-card">
+        <q-card-section class="row items-center q-pb-sm">
+          <div class="text-subtitle1 text-weight-medium">Listado</div>
+          <q-space />
+          <q-badge color="grey-8" :label="`${data.length} registros`" />
+        </q-card-section>
+        <q-separator />
+        <q-card-section class="q-pa-none">
+          <q-table dense flat :filter="filter" :rows="data" :columns="columns" row-key="name" :rows-per-page-options="[50,100]">
 
            <template v-slot:body-cell-estado="props">
             <q-td key="estado" :props="props">
@@ -48,13 +63,15 @@
             <template v-slot:body-cell-opcion="props">
 
             <q-td key="opcion" :props="props">
-              <q-btn dense round flat color="yellow" @click="editRow(props)" icon="edit" />
-              <q-btn dense round flat color="positive" @click="cambiopass(props)" icon="vpn_key" />
-              <q-btn dense round flat color="red" @click="deleteRow(props)" icon="delete" ></q-btn>
+              <q-btn v-if="$store.hasPerm('usuarios.editar')" dense round flat color="yellow" @click="editRow(props)" icon="edit" />
+              <q-btn v-if="$store.hasPerm('usuarios.editar')" dense round flat color="positive" @click="cambiopass(props)" icon="vpn_key" />
+              <q-btn v-if="$store.hasPerm('usuarios.editar')" dense round flat color="red" @click="deleteRow(props)" icon="delete" ></q-btn>
             </q-td>
 
         </template>
       </q-table>
+        </q-card-section>
+      </q-card>
 
       <q-dialog v-model="dialog_mod">
         <q-card style="max-width: 80%; width: 50%">
@@ -90,7 +107,7 @@
       </q-dialog>
 
 
-    </div>
+    </q-page>
   </template>
 
   <script>
@@ -102,7 +119,9 @@
     data () {
       return {
         store:globalStore(),
-        roles: ['ADMINISTRADOR', 'USUARIO', 'INSPECTOR','CHOFER'],
+        //roles: ['ADMINISTRADOR', 'USUARIO', 'INSPECTOR','CHOFER'],
+        roles: [],
+        rol:{nombre:''  },
         alert: false,
         dialog_mod: false,
         dialog_del: false,
@@ -128,15 +147,19 @@
     },
 
     mounted () {
-       if (this.$store.user.id!=1){
-         this.$router.replace({ path: '/' })
-      } 
+      if (!this.$store.hasPerm('usuarios.ver')) {
+        this.$router.replace({ path: '/' })
+      }
 
       this.misdatos()
-
+      this.getRoles()
     },
     methods: {
-
+      getRoles () {
+        this.$api.get('rol').then(res => {
+          this.roles = res.data
+        })
+      },
       regDialog () {
         this.dato = { }
         this.alert = true
@@ -161,6 +184,16 @@
       onSubmit () {
 
         this.$q.loading.show()
+        if(!this.rol || !this.rol.id){
+          this.$q.notify({
+            message: 'Selecciona un rol',
+            color: 'red',
+            icon: 'error'
+          })
+          this.$q.loading.hide()
+          return
+        }
+        this.dato.rol_id = this.rol.id
         this.$api.post('user', this.dato).then(() => {
           // console.log(res.data)
           this.$q.notify({
@@ -185,6 +218,16 @@
       onMod () {
  
         this.$q.loading.show()
+        if(!this.rol || !this.rol.id){
+          this.$q.notify({
+            message: 'Selecciona un rol',
+            color: 'red',
+            icon: 'error'
+          })
+          this.$q.loading.hide()
+          return
+        }
+        this.dato2.rol_id = this.rol.id
         this.$api.put('user/' + this.dato2.id, this.dato2).then(() => {
           this.$q.notify({
             color: 'green-4',

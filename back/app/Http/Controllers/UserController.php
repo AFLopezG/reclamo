@@ -7,16 +7,43 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use ElephantIO\Client;
 use Exception;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
+    private function permisoIdsDeRol(?int $rolId): array
+    {
+        if (!$rolId) return [];
+        return DB::table('permiso_rol')
+            ->select('permiso_id')
+            ->where('rol_id', $rolId)
+            ->get()
+            ->pluck('permiso_id')
+            ->toArray();
+    }
+
+    private function permisoCodigosDeRol(?int $rolId): array
+    {
+        if (!$rolId) return [];
+        return DB::table('permiso_rol')
+            ->join('permisos', 'permisos.id', '=', 'permiso_rol.permiso_id')
+            ->where('permiso_rol.rol_id', $rolId)
+            ->orderBy('permisos.codigo')
+            ->pluck('permisos.codigo')
+            ->map(fn ($c) => strtolower(trim((string) $c)))
+            ->toArray();
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
         //
-        return User::where('id','<>',1)->get();
+        return User::query()
+            ->with('role')
+            ->where('id', '<>', 1)
+            ->get();
     }
 
     /**
@@ -30,13 +57,13 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'password' => 'required',
-            'rol' => 'required',
+            'rol_id' => 'required',
         ]);
         
         $validated['password']=Hash::make($validated['password']);
 
         $user = User::create($validated);
-        return($user);
+        return $user->fresh(['role']);
     }
 
     /**
@@ -56,13 +83,13 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required',
             'nombre' => 'required',
-            'rol' => 'required',
+            'rol_id' => 'required',
             'email' => 'required|email',
         ]);
         
-        $user = User::find($request->id);
+        $user = User::findOrFail($id);
         $user->update($validated);
-        return response(['user' => $user]);
+        return response(['user' => $user->fresh(['role'])]);
     }
 
     public function updatePassword(Request $request, User $user)
@@ -87,13 +114,25 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-
-        $user = User::where('name',$request->name)->where('estado','ACTIVO')->first();
+        $validated = $request->validate([
+            'name' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ]);
+        $user = User::with('role')
+            ->where('name', $validated['name'])
+            ->where('estado', 'ACTIVO')
+            ->first();
         if ($user) {
-            if (Hash::check($request->password, $user->password)) {
-                $user = User::where('name',$request->name)->first();
+            if (Hash::check($validated['password'], $user->password)) {
                 $token = $user->createToken('authToken')->plainTextToken;
-                return response(['user' => $user, 'token' => $token]);
+                $permisoIds = $this->permisoIdsDeRol($user->rol_id);
+                $permisos = $this->permisoCodigosDeRol($user->rol_id);
+                return response()->json([
+                    'user' => $user,
+                    'permisos' => $permisos,
+                    'permiso_ids' => $permisoIds,
+                    'token' => $token,
+                ]);
             } else {
                 return response(['message' => 'Contraseña incorrecta'],500);
             }
@@ -104,16 +143,26 @@ class UserController extends Controller
 
     public function me(Request $request)
     {
-        $user=User::where('id',$request->user()->id)
-                    ->where('estado','ACTIVO')
-                    ->firstOrFail();
-                return $user;
+        $user = User::query()
+            ->with('role')
+            ->where('id',$request->user()->id)
+            ->where('estado','ACTIVO')
+            ->firstOrFail();
+        $permisoIds = $this->permisoIdsDeRol($user->rol_id);
+        $permisos = $this->permisoCodigosDeRol($user->rol_id);
+        return response()->json([
+            'user' => $user,
+            'permisos' => $permisos,
+            'permiso_ids' => $permisoIds,
+        ]);
     }
 
     public function listPosicion(){
-        return  User::where('lat', '<>', '0')
-        ->where('lng', '<>', '0')
-        ->get();
+        return User::query()
+            ->with('role')
+            ->where('lat', '<>', '0')
+            ->where('lng', '<>', '0')
+            ->get();
     }
 
 

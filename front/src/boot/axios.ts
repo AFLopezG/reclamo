@@ -1,7 +1,7 @@
 import { boot } from 'quasar/wrappers';
 import axios from 'axios';
 import {globalStore} from 'stores/globalStore';
-import { io } from 'socket.io-client';
+
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -10,12 +10,11 @@ import { io } from 'socket.io-client';
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({ baseURL: import.meta.env.VITE_API_BACK });
-const socket = io(import.meta.env.VITE_SOCKET_URL);
+
 
 export default boot(({ app,router }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
   app.config.globalProperties.$url=import.meta.env.VITE_API_BACK
-  app.config.globalProperties.$socket =socket
   app.config.globalProperties.$store=globalStore()
   app.config.globalProperties.$axios = axios;
   // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
@@ -29,21 +28,24 @@ export default boot(({ app,router }) => {
     api.defaults.headers.common.Authorization = `Bearer ${token}`
     api.post('me').then((response) => {
       console.log(response.data)
-      globalStore().user = response.data
+      if (response?.data?.user) {
+        globalStore().setAuth(response.data.user, response.data.permisos || [])
+      } else {
+        // Compatibilidad por si el backend devuelve solo el usuario
+        globalStore().setAuth(response.data, [])
+      }
       globalStore().isLoggedIn = true
+
     }).catch(() => {
       app.config.globalProperties.$api.defaults.headers.common['Authorization']=''
-      globalStore().user={}
+      globalStore().clearAuth()
       localStorage.removeItem('tokenReclamo')
       globalStore().isLoggedIn=false
           router.push('/login')
     })
-  }else {
-    router.push('/login')
-    globalStore().user={}
-    globalStore().isLoggedIn=false
-      localStorage.removeItem('tokenReclamo')
-    globalStore().isLoggedIn=false
+  } else {
+    globalStore().clearAuth()
+    globalStore().isLoggedIn = false
   }
 });
 

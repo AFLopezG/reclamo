@@ -1,6 +1,22 @@
 <template>
-    <q-page>
-        <div id="map" style="height: 90vh"></div>
+    <q-page class="admin-page">
+      <div class="admin-hero q-pa-md q-mb-md">
+        <div class="row items-center q-col-gutter-md">
+          <div class="col-12 col-md-6">
+            <div class="text-h5 text-weight-bold">Posición del personal</div>
+            <div class="text-caption admin-subtitle">Ubicación en tiempo real (si está habilitada)</div>
+          </div>
+          <div class="col-12 col-md-6 admin-actions">
+            <q-btn color="info" icon="refresh" label="Actualizar" @click="misUsuarios" />
+          </div>
+        </div>
+      </div>
+
+      <q-card flat bordered class="admin-card">
+        <q-card-section class="q-pa-none">
+          <div id="map" class="map-area"></div>
+        </q-card-section>
+      </q-card>
     </q-page>
 </template>
 <script>
@@ -26,6 +42,10 @@ export default {
         
     },
     mounted(){
+     if (!this.$store.hasPerm('posicion.ver')) {
+        this.$router.replace('/navegador')
+        return
+      }
      console.log('Conectando a socket...');
       this.inicializarMapa()
       this.misUsuarios() // Cargar datos y agregarlos al mapa
@@ -181,3 +201,10 @@ this.map.addControl(new actualizarControl());
     }
 }
 </script>
+
+<style scoped>
+.map-area {
+  height: calc(100vh - 210px);
+  min-height: 420px;
+}
+</style>

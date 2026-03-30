@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::post('login', [App\Http\Controllers\UserController::class, 'login']);
+Route::get('licencias/verificar/{codigo}', [App\Http\Controllers\LicenciaController::class, 'verifyApi']);
 
 Route::post('formulario',[\App\Http\Controllers\FormularioController::class,'store']); 
 Route::post('searchpersona/',[\App\Http\Controllers\PersonaController::class,'searchpersona']); 
@@ -38,5 +39,36 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('actualizar',[\App\Http\Controllers\InspectionController::class,'actualizar']); 
     Route::post('actualizarPosicion',[\App\Http\Controllers\UserController::class,'actualizarPosicion']);     
     Route::get('listPosicion',[\App\Http\Controllers\UserController::class,'listPosicion']);     
+
+    Route::apiResource('licencia', App\Http\Controllers\LicenciaController::class);
+    Route::post('licencia/{licencia}/anular', [App\Http\Controllers\LicenciaController::class, 'anular']);
+    Route::post('licencia/{licencia}/renovar', [App\Http\Controllers\LicenciaController::class, 'renovar']);
+    Route::get('licencia/{licencia}/credencial', [App\Http\Controllers\LicenciaController::class, 'credencialPdf']);
+    Route::get('licencia/{licencia}/pdf', [App\Http\Controllers\LicenciaController::class, 'resumenPdf']);
+    Route::get('licencias/pdf', [App\Http\Controllers\LicenciaController::class, 'listaPdf']);
+
+    Route::get('contribuyente/buscar', [App\Http\Controllers\ContribuyenteController::class, 'buscar']);
+    Route::post('contribuyente/actualizar', [App\Http\Controllers\ContribuyenteController::class, 'actualizar']);
+
+    Route::get('permiso', [App\Http\Controllers\PermisoController::class, 'index']);
+    Route::post('permiso', [App\Http\Controllers\PermisoController::class, 'store']);
+    Route::put('permiso/{permiso}', [App\Http\Controllers\PermisoController::class, 'update']);
+    Route::delete('permiso/{permiso}', [App\Http\Controllers\PermisoController::class, 'destroy']);
+    Route::get('permiso/roles', [App\Http\Controllers\PermisoController::class, 'roles']);
+    Route::post('permiso/asignar', [App\Http\Controllers\PermisoController::class, 'asignar']);
+
+    Route::get('rol', [App\Http\Controllers\RolController::class, 'index']);
+    Route::post('rol', [App\Http\Controllers\RolController::class, 'store']);
+    Route::put('rol/{rol}', [App\Http\Controllers\RolController::class, 'update']);
+    Route::delete('rol/{rol}', [App\Http\Controllers\RolController::class, 'destroy']);
+
+    Route::apiResource('sindicato', App\Http\Controllers\SindicatoController::class);
+
+    Route::apiResource('sancion', App\Http\Controllers\SancionController::class)->except(['show']);
+
+    Route::get('multa/buscar', [App\Http\Controllers\MultaController::class, 'buscarPorPlaca']);
+    Route::post('multa', [App\Http\Controllers\MultaController::class, 'store']);
+    Route::post('multa/reporte', [App\Http\Controllers\MultaController::class, 'reporte']);
+    Route::get('multa/reporte/pdf', [App\Http\Controllers\MultaController::class, 'reportePdf']);
     
 });

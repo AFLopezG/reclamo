@@ -1,17 +1,11 @@
 <template>
     <q-layout view="lHh Lpr lFf" >
-      <q-page-container class="dynamic-bg q-pa-sm">
-        <q-page>
-          <br><br>
-          <br><br>
-          <br><br>
-          <br>
-          <br><br>
-          <div class="row">
-            <div class="col-12 q-pa-lg">
+      <q-page-container class="dynamic-bg public-page">
+        <q-page class="row justify-center items-start">
+          <q-card class="public-card reclamo-card q-pa-md">
 
 
-      <q-separator />
+      <q-separator class="q-mb-md" />
         <q-form @submit="onSubmit" class="q-gutter-md">
       <!-- Datos de Persona -->
        <div class="row">
@@ -37,25 +31,22 @@
         accept="image/*"
         @added="onFileAdded"
         ref="uploader"
+        :factory="compressBeforeUpload"
         :rules="[files => files.length > 0 || 'La imagen es requerida']"
       />
       </div>
-      <!-- Previsualización -->
-      <div v-if="formulario.imagen"> 
-        <q-img :src="formulario.imagen" class="q-mb-md" :style="{ maxWidth: '200px' }" />
-      </div>
+
 
       <!-- Botón de Enviar -->
       <div class="col-12 text-center"><q-btn dense  rounded label="Enviar su Reclamo" type="submit" icon="send" color="green"  size="15px"/></div>
     </q-form>
-
-  </div>
-</div>
-</q-page>
+          </q-card>
+        </q-page>
       </q-page-container>
     </q-layout>   
 </template>
 <script>
+import Compressor from 'compressorjs'
 
 export default {
     name:'reclamoPage',
@@ -72,6 +63,38 @@ export default {
       this.getDelitos()
     },
     methods:{
+          async compressImage(file, quality = 0.8) {
+      return new Promise((resolve, reject) => {
+        new Compressor(file, {
+          quality: quality,
+          maxWidth: 1920,
+          maxHeight: 1920,
+          convertSize: 1000000, // convierte PNG a JPEG si pasa 1MB
+          success(result) {
+            // Si sigue pesando más de 2MB, intenta con menor calidad
+            if (result.size > 2 * 1024 * 1024 && quality > 0.2) {
+              resolve(this.compressImage(file, quality - 0.1))
+            } else {
+              resolve(result)
+            }
+          },
+          error(err) {
+            console.error('Error al comprimir:', err)
+            reject(err)
+          },
+        })
+      })
+    },
+        async compressBeforeUpload(files) {
+      const compressedFiles = []
+
+      for (const file of files) {
+        const compressed = await this.compressImage(file)
+        compressedFiles.push(compressed)
+      }
+
+      return compressedFiles
+    },
       onFileAdded(files) {
         if (files && files.length > 0) {
           this.formulario.imagen = files[0]; // Guarda el primer archivo en la variable
@@ -145,7 +168,7 @@ export default {
           this.$q.loading.show()
           const formData = new FormData();
           formData.append('cedula', this.persona.cedula);
-          formData.append('comp', this.persona.comp);
+          //formData.append('comp', this.persona.comp);
           formData.append('nombre', this.persona.nombre);
           formData.append('telefono', this.persona.telefono);
           formData.append('direccion', this.formulario.direccion);
@@ -217,6 +240,20 @@ export default {
   background-repeat: no-repeat;
   background-size: 100% 100%;
       background-image: url('/img/movil.png');
+    }
+  }
+
+  .reclamo-card {
+    width: 760px;
+    max-width: 96vw;
+    position: relative;
+    top: 150px;
+    background-color: transparent !important;
+  }
+
+  @media (min-width: 768px) {
+    .reclamo-card {
+      top: 250px;
     }
   }
 </style>
