@@ -8,16 +8,60 @@ use Illuminate\Support\Facades\Hash;
 use ElephantIO\Client;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class UserController extends Controller
 {
+    private function rolNombrePorId(?int $rolId): ?string
+    {
+        if (!$rolId) return null;
+        $nombre = DB::table('roles')->where('id', $rolId)->value('nombre');
+        $nombre = is_string($nombre) ? trim($nombre) : null;
+        return $nombre === '' ? null : $nombre;
+    }
+
+    private function permisoRolFilter(\Illuminate\Database\Query\Builder $query, ?int $rolId): \Illuminate\Database\Query\Builder
+    {
+        if (!$rolId) {
+            // No rol => sin permisos.
+            return $query->whereRaw('1 = 0');
+        }
+
+        $hasRolId = Schema::hasColumn('permiso_rol', 'rol_id');
+        $hasRol = Schema::hasColumn('permiso_rol', 'rol');
+
+        if (!$hasRolId && !$hasRol) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        $rolNombre = $hasRol ? $this->rolNombrePorId($rolId) : null;
+        $rolNombreUpper = $rolNombre ? strtoupper($rolNombre) : null;
+
+        return $query->where(function ($q) use ($hasRolId, $rolId, $hasRol, $rolNombre, $rolNombreUpper) {
+            if ($hasRolId) {
+                $q->where('rol_id', $rolId);
+            }
+            if ($hasRol && $rolNombre) {
+                if ($hasRolId) $q->orWhere('rol', $rolNombre);
+                else $q->where('rol', $rolNombre);
+
+                if ($rolNombreUpper && $rolNombreUpper !== $rolNombre) {
+                    $q->orWhere('rol', $rolNombreUpper);
+                }
+            }
+        });
+    }
+
     private function permisoIdsDeRol(?int $rolId): array
     {
         if (!$rolId) return [];
-        return DB::table('permiso_rol')
+        $query = DB::table('permiso_rol')
             ->select('permiso_id')
-            ->where('rol_id', $rolId)
-            ->get()
+            ->orderBy('permiso_id');
+
+        $query = $this->permisoRolFilter($query, $rolId);
+
+        return $query->get()
             ->pluck('permiso_id')
             ->toArray();
     }
@@ -25,11 +69,13 @@ class UserController extends Controller
     private function permisoCodigosDeRol(?int $rolId): array
     {
         if (!$rolId) return [];
-        return DB::table('permiso_rol')
+        $query = DB::table('permiso_rol')
             ->join('permisos', 'permisos.id', '=', 'permiso_rol.permiso_id')
-            ->where('permiso_rol.rol_id', $rolId)
-            ->orderBy('permisos.codigo')
-            ->pluck('permisos.codigo')
+            ->orderBy('permisos.codigo');
+
+        $query = $this->permisoRolFilter($query, $rolId);
+
+        return $query->pluck('permisos.codigo')
             ->map(fn ($c) => strtolower(trim((string) $c)))
             ->toArray();
     }
